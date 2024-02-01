@@ -3,5 +3,4 @@ const users = [
     { id: 2, username: 'usuario2', password: 'contraseña2', name: 'Usuario Dos' },
   ];
   
-  module.exports = users;
-  
+  module.exports = users;  

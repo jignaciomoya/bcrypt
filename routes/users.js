@@ -4,15 +4,34 @@ const { generateToken, verifyToken } = require('../middlewares/authMiddleware');
 const users = require('../data/users');
 
 router.post('/login', (req, res) => {
-  // Implementa la lógica de autenticación aquí
+    const { username, password } = req.body;
+    const user = users.find(
+        (u) => u.username === username && u.password === password
+    );
+
+    if (user) {
+        const token = generateToken(user);
+        req.session.token = token;
+        res.redirect('/dashboard');
+    } else {
+        res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
 });
 
 router.get('/dashboard', verifyToken, (req, res) => {
-  // Implementa la lógica para el panel de control aquí
+    const userId = req.user;
+    const user = users.find((u) => u.id === userId);
+
+    if (user) {
+        res.send(` <h1>Bienvenido, ${user.name}!</h1> <p>ID: ${user.id}</p> <p>Usuario: ${user.username}</p> <br> <form action="/logout" method="post"> <button type="submit">Cerrar sesión</button> </form> <a href="/">home</a> `);
+    } else {
+        res.status(401).json({ message: 'Usuario no encontrado' });
+    }
 });
 
 router.post('/logout', (req, res) => {
-  // Implementa la lógica de cierre de sesión aquí
+    req.session.destroy();
+    res.redirect('/');
 });
 
 module.exports = router;
